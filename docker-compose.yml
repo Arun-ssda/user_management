@@ -1,0 +1,46 @@
+version: '3.8'
+services:
+  stripe-mock:
+    image: stripe/stripe-mock
+    ports:
+      - "12111:12111"
+      - "12112:12112"
+    container_name: stripe_mock
+    networks:
+      - user_subscriptions
+
+  mysql:
+    image: mysql:8.0
+    container_name: user_subscriptions_mysql_db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - user_subscriptions
+
+  user_management:
+    build:
+      context: ./user_management
+      dockerfile: Dockerfile.development
+    container_name: user_management
+    environment:
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./user_management:/rails/user_management
+    networks:
+      - user_subscriptions
+
+volumes:
+  db_data:
+    driver: local
+
+networks:
+  user_subscriptions:
+    driver: bridge

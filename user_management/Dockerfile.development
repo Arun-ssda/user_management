@@ -1,0 +1,44 @@
+ARG RUBY_VERSION=3.4.3
+FROM ruby:$RUBY_VERSION-slim
+
+# Set working directory
+WORKDIR /rails/user_management
+
+# Install OS dependencies for development
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y \
+      build-essential \
+      curl \
+      git \
+      libjemalloc2 \
+      libvips \
+      default-mysql-client \
+      default-libmysqlclient-dev \
+      libyaml-dev \
+      pkg-config \
+      nodejs \
+      yarn \
+      sqlite3 \
+      && rm -rf /var/lib/apt/lists/*
+
+# Environment for development
+ENV RAILS_ENV=development \
+    BUNDLE_PATH=/bundle \
+    BUNDLE_JOBS=4 \
+    BUNDLE_RETRY=3
+
+# Install gems early for cache efficiency
+COPY Gemfile Gemfile.lock ./
+RUN gem install bundler:2.5.9 && bundle install
+
+# Copy the application code
+COPY . .
+
+# Ensure binstubs are executable
+RUN chmod +x bin/*
+
+# Expose port Rails will use
+EXPOSE 3000
+
+# Allow binding to 0.0.0.0 in development
+CMD ["bin/rails", "server", "-b", "0.0.0.0"]

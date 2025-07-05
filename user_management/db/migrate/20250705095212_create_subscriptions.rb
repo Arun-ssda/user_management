@@ -7,6 +7,7 @@ class CreateSubscriptions < ActiveRecord::Migration[8.0]
       t.string :status
       t.timestamps
       t.index [:user_id, :status]
+      t.index [:product_id, :status]
     end
   end
 end

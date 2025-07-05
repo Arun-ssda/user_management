@@ -1,0 +1,25 @@
+<h1>Login</h1>
+
+<%= form_with url: login_path, method: :post, local: true do %>
+  <div>
+    <%= label_tag :email, "Email" %><br>
+    <%= email_field_tag :email, params[:email], required: true %>
+  </div>
+
+  <div>
+    <%= label_tag :password, "Password" %><br>
+    <%= password_field_tag :password, nil, required: true %>
+  </div>
+
+  <div style="margin-top: 1em;">
+    <%= submit_tag "Login" %>
+  </div>
+<% end %>
+
+<% if flash[:alert] %>
+  <p style="color: red;"><%= flash[:alert] %></p>
+<% end %>
+
+<% if flash[:notice] %>
+  <p style="color: green;"><%= flash[:notice] %></p>
+<% end %>

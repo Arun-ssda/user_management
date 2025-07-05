@@ -1,5 +1,5 @@
 module TransactionWrapper
-  def wrap_in_transaction
+  def self.wrap_in_transaction
     ActiveRecord::Base.transaction do
       yield
     end

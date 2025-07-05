@@ -7,9 +7,8 @@ class User < ApplicationRecord
   before_save :encrypt_password
   after_commit :create_customer_in_stripe, on: :create
 
-  has_many :user_subscriptions
-  has_many :subscriptions, through: :user_subscriptions
-
+  has_many :subscriptions
+  
   def password
     @password ||= BCrypt::Password.new(password_hash)
   end

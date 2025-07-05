@@ -11,4 +11,15 @@ Rails.application.routes.draw do
 
   # Defines the root path route ("/")
   # root "posts#index"
+  get 'login', to: 'sessions#new', as: :login
+  post 'login', to: 'sessions#create'
+  delete 'logout', to: 'sessions#destroy', as: :logout
+
+  resources :subscriptions, only: [:index, :create]
+
+  namespace :webhooks do
+    post 'stripe_events', to: 'stripe_events#receive'
+  end
+
+  root "subscriptions#index"
 end

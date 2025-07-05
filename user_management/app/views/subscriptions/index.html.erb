@@ -1,0 +1,53 @@
+<h1>Your Active Subscriptions</h1>
+
+<% if @subscriptions.any? %>
+  <table>
+    <thead>
+      <tr>
+        <th>Subscription ID</th>
+        <th>Status</th>
+        <th>Product</th>
+        <th>Price</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @subscriptions.each do |sub| %>
+        <tr>
+          <td><%= sub.id %></td>
+          <td><%= sub.status %></td>
+          <td><%= sub.product.name %></td>
+          <td><%= number_to_currency(sub.product.unit_amount / 100.0, unit: sub.product.currency.upcase + " ") %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+    <p>You have no active subscriptions.</p>
+<% end %>
+
+<hr>
+
+<h2>Available Subscriptions</h2>
+
+<% if @available_subscriptions.any? %>
+  <table>
+    <thead>
+      <tr>
+        <th>Product</th>
+        <th>Price</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @available_subscriptions.each do |product| %>
+        <tr>
+          <td><%= product.name %></td>
+          <td><%= number_to_currency(product.unit_amount / 100.0, unit: product.currency.upcase + " ") %></td>
+          <td><%= button_to "Subscribe", subscriptions_path(product_id: product.id), method: :post %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+    <p>No available plans at the moment.</p>
+<% end %>

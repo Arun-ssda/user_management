@@ -8,6 +8,8 @@ class Subscription < ApplicationRecord
 
   after_commit :create_subscription_on_stripe, on: :create
 
+  scope :active, -> { where(status: [:init, :unpaid, :paid]) }
+
   state_machine :status, initial: :init do
     state :unpaid
     state :paid

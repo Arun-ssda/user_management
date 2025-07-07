@@ -1,0 +1,143 @@
+{
+	"info": {
+		"_postman_id": "1c3e6cac-f96d-465c-8c12-16083d9f93e8",
+		"name": "Stripe Webhook Testing",
+		"description": "Simulate Stripe Webhook Events",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "44620486",
+		"_collection_link": "https://arun-7632419.postman.co/workspace/Arun's-Workspace~c59d53ef-d44d-4d6f-8478-d8a97587417b/collection/44620486-1c3e6cac-f96d-465c-8c12-16083d9f93e8?action=share&source=collection_link&creator=44620486"
+	},
+	"item": [
+		{
+			"name": "Subscription Created",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"id\": \"evt_{{$randomPassword}}\",\n  \"type\": \"customer.subscription.created\",\n  \"data\": {\n    \"object\": {\n      \"id\": \"{{subscriptionId}}\",\n      \"object\": \"subscription\",\n      \"customer\": \"{{customerId}}\",\n      \"status\": \"active\",\n      \"items\": {\n        \"object\": \"list\",\n        \"data\": [\n          {\n            \"id\": \"{{subscriptionId}}\",\n            \"object\": \"subscription_item\",\n            \"price\": {\n              \"id\": \"{{priceId}}\",\n              \"object\": \"price\",\n              \"product\": \"{{productId}}\",\n              \"unit_amount\": 1000,\n              \"currency\": \"usd\"\n            },\n            \"quantity\": 1\n          }\n        ]\n      }\n    }\n  }\n}\n"
+				},
+				"url": {
+					"raw": "http://localhost:3000/webhooks/stripe_events",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"webhooks",
+						"stripe_events"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Subscription Deleted",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"id\": \"evt_{{$randomPassword}}\",\n  \"type\": \"customer.subscription.deleted\",\n  \"data\": {\n    \"object\": {\n      \"id\": \"{{subscriptionId}}\",\n      \"object\": \"subscription\",\n      \"customer\": \"{{customerId}}\",\n      \"status\": \"canceled\",\n      \"items\": {\n        \"object\": \"list\",\n        \"data\": [\n          {\n            \"id\": \"{{subscriptionId}}\",\n            \"object\": \"subscription_item\",\n            \"price\": {\n              \"id\": \"{{priceId}}\",\n              \"object\": \"price\",\n              \"product\": \"{{productId}}\",\n              \"unit_amount\": 1000,\n              \"currency\": \"usd\",\n              \"recurring\": {\n                \"interval\": \"month\"\n              }\n            },\n            \"quantity\": 1\n          }\n        ]\n      }\n    }\n  }\n}\n"
+				},
+				"url": {
+					"raw": "http://localhost:3000/webhooks/stripe_events",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"webhooks",
+						"stripe_events"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Invoice Payment Succeeded",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"id\": \"evt_{{$randomPassword}}\",\n  \"type\": \"invoice.payment_succeeded\",\n  \"data\": {\n    \"object\": {\n      \"id\": \"in_123\",\n      \"object\": \"invoice\",\n      \"customer\": \"{{customerId}}\",\n      \"subscription\": \"{{subscriptionId}}\",\n      \"amount_paid\": 1000,\n      \"currency\": \"usd\",\n      \"status\": \"paid\",\n      \"paid\": true\n    }\n  }\n}\n"
+				},
+				"url": {
+					"raw": "http://localhost:3000/webhooks/stripe_events",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"webhooks",
+						"stripe_events"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "customerId",
+			"value": "cus_OyzyEG0loh9Atil",
+			"type": "string"
+		},
+		{
+			"key": "subscriptionId",
+			"value": "sub_test_123",
+			"type": "string"
+		},
+		{
+			"key": "productId",
+			"value": "prod_OyzyRH5hlehwdwx",
+			"type": "string"
+		},
+		{
+			"key": "priceId",
+			"value": "price_OyzyRjBqH6he6OK",
+			"type": "string"
+		}
+	]
+}

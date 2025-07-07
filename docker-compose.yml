@@ -36,6 +36,9 @@ services:
       - "3000:3000"
     volumes:
       - ./user_management:/rails/user_management
+    depends_on:
+      - mysql
+      - stripe-mock
     networks:
       - user_subscriptions
 

@@ -38,8 +38,8 @@ module StripeInterface
       subscription ||= user.subscriptions.create!( stripe_subscription_id: @event.subscription_id, product: product) if user && product && @event.subscription_id.present?
 
       validate_existing_subscription!
-      raise "Subscription already present and active for user #{user.customer_id} with subscription ID: #{@event.subscription_id}" if subscription.paid?
-      raise "Subscription already cancelled for user #{user.customer_id} with subscription ID: #{@event.subscription_id}" if subscription.cancelled?
+      raise "Subscription already cancelled for user #{@event.customer_id} with subscription ID: #{@event.subscription_id}" if subscription.cancelled?
+      raise "Subscription already present and active for user #{@event.customer_id} with subscription ID: #{@event.subscription_id}" if subscription.paid?
 
       subscription.initiate!
     end
@@ -49,7 +49,7 @@ module StripeInterface
       subscription = @event_record.subscription
 
       validate_existing_subscription!
-      raise "Subscription is already cancelled for user #{user.customer_id} with subscription ID: #{@event.subscription_id}" if subscription.cancelled?
+      raise "Subscription is already cancelled for user #{@event.customer_id} with subscription ID: #{@event.subscription_id}" if subscription.cancelled?
 
       subscription.cancel!
     end
@@ -58,9 +58,9 @@ module StripeInterface
       user = @event_record.user
       subscription = @event_record.subscription
 
-      raise "Subscription not found for user #{user.customer_id} with subscription ID: #{@event.subscription_id}" if subscription.nil?      
-      raise "Subscription is already paid for user #{user.customer_id} with subscription ID: #{@event.subscription_id}" if subscription.paid?
-      raise "Subscription is cancelled, cannot process payment for user #{user.customer_id} with subscription ID: #{@event.subscription_id}" if subscription.cancelled?
+      raise "Subscription not found for user #{@event.customer_id} with subscription ID: #{@event.subscription_id}" if subscription.nil?      
+      raise "Subscription is already paid for user #{@event.customer_id} with subscription ID: #{@event.subscription_id}" if subscription.paid?
+      raise "Subscription is cancelled, cannot process payment for user #{@event.customer_id} with subscription ID: #{@event.subscription_id}" if subscription.cancelled?
 
       subscription.process_payment!
     end

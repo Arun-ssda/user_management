@@ -20,7 +20,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"id\": \"evt_{{$randomPassword}}\",\n  \"type\": \"customer.subscription.created\",\n  \"data\": {\n    \"object\": {\n      \"id\": \"{{subscriptionId}}\",\n      \"object\": \"subscription\",\n      \"customer\": \"{{customerId}}\",\n      \"status\": \"active\",\n      \"items\": {\n        \"object\": \"list\",\n        \"data\": [\n          {\n            \"id\": \"{{subscriptionId}}\",\n            \"object\": \"subscription_item\",\n            \"price\": {\n              \"id\": \"{{priceId}}\",\n              \"object\": \"price\",\n              \"product\": \"{{productId}}\",\n              \"unit_amount\": 1000,\n              \"currency\": \"usd\"\n            },\n            \"quantity\": 1\n          }\n        ]\n      }\n    }\n  }\n}\n"
+					"raw": "{\n  \"id\": \"{{eventId}}\",\n  \"type\": \"customer.subscription.created\",\n  \"data\": {\n    \"object\": {\n      \"id\": \"{{subscriptionId}}\",\n      \"object\": \"subscription\",\n      \"customer\": \"{{customerId}}\",\n      \"status\": \"active\",\n      \"items\": {\n        \"object\": \"list\",\n        \"data\": [\n          {\n            \"id\": \"{{subscriptionId}}\",\n            \"object\": \"subscription_item\",\n            \"price\": {\n              \"id\": \"{{priceId}}\",\n              \"object\": \"price\",\n              \"product\": \"{{productId}}\",\n              \"unit_amount\": 1000,\n              \"currency\": \"usd\"\n            },\n            \"quantity\": 1\n          }\n        ]\n      }\n    }\n  }\n}\n"
 				},
 				"url": {
 					"raw": "http://localhost:3000/webhooks/stripe_events",
@@ -49,7 +49,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"id\": \"evt_{{$randomPassword}}\",\n  \"type\": \"customer.subscription.deleted\",\n  \"data\": {\n    \"object\": {\n      \"id\": \"{{subscriptionId}}\",\n      \"object\": \"subscription\",\n      \"customer\": \"{{customerId}}\",\n      \"status\": \"canceled\",\n      \"items\": {\n        \"object\": \"list\",\n        \"data\": [\n          {\n            \"id\": \"{{subscriptionId}}\",\n            \"object\": \"subscription_item\",\n            \"price\": {\n              \"id\": \"{{priceId}}\",\n              \"object\": \"price\",\n              \"product\": \"{{productId}}\",\n              \"unit_amount\": 1000,\n              \"currency\": \"usd\",\n              \"recurring\": {\n                \"interval\": \"month\"\n              }\n            },\n            \"quantity\": 1\n          }\n        ]\n      }\n    }\n  }\n}\n"
+					"raw": "{\n  \"id\": \"{{eventId}}\",\n  \"type\": \"customer.subscription.deleted\",\n  \"data\": {\n    \"object\": {\n      \"id\": \"{{subscriptionId}}\",\n      \"object\": \"subscription\",\n      \"customer\": \"{{customerId}}\",\n      \"status\": \"canceled\",\n      \"items\": {\n        \"object\": \"list\",\n        \"data\": [\n          {\n            \"id\": \"{{subscriptionId}}\",\n            \"object\": \"subscription_item\",\n            \"price\": {\n              \"id\": \"{{priceId}}\",\n              \"object\": \"price\",\n              \"product\": \"{{productId}}\",\n              \"unit_amount\": 1000,\n              \"currency\": \"usd\",\n              \"recurring\": {\n                \"interval\": \"month\"\n              }\n            },\n            \"quantity\": 1\n          }\n        ]\n      }\n    }\n  }\n}\n"
 				},
 				"url": {
 					"raw": "http://localhost:3000/webhooks/stripe_events",
@@ -78,7 +78,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"id\": \"evt_{{$randomPassword}}\",\n  \"type\": \"invoice.payment_succeeded\",\n  \"data\": {\n    \"object\": {\n      \"id\": \"in_123\",\n      \"object\": \"invoice\",\n      \"customer\": \"{{customerId}}\",\n      \"subscription\": \"{{subscriptionId}}\",\n      \"amount_paid\": 1000,\n      \"currency\": \"usd\",\n      \"status\": \"paid\",\n      \"paid\": true\n    }\n  }\n}\n"
+					"raw": "{\n  \"id\": \"{{eventId}}\",\n  \"type\": \"invoice.payment_succeeded\",\n  \"data\": {\n    \"object\": {\n      \"id\": \"in_123\",\n      \"object\": \"invoice\",\n      \"customer\": \"{{customerId}}\",\n      \"subscription\": \"{{subscriptionId}}\",\n      \"amount_paid\": 1000,\n      \"currency\": \"usd\",\n      \"status\": \"paid\",\n      \"paid\": true\n    }\n  }\n}\n"
 				},
 				"url": {
 					"raw": "http://localhost:3000/webhooks/stripe_events",
@@ -103,6 +103,22 @@
 				"type": "text/javascript",
 				"packages": {},
 				"exec": [
+					"pm.environment.set(\"eventId\", \"evt_\"+Math.random().toString(36).substring(2, 10));",
+					"",
+					"const secret = 'whsec_test_secret';",
+					"const timestamp = Math.floor(Date.now() / 1000);",
+					"const rawBody = pm.request.body.raw;",
+					"const body = pm.variables.replaceIn(rawBody);",
+					"const signedPayload = `${timestamp}.${body}`;",
+					"const signature = CryptoJS.HmacSHA256(signedPayload, secret).toString(CryptoJS.enc.Hex);",
+					"const stripeSignature = `t=${timestamp},v1=${signature}`;",
+					"pm.request.headers.upsert({",
+					"  key: 'Stripe-Signature',",
+					"  value: stripeSignature",
+					"});",
+					"",
+					"console.log('Stripe-Signature:', stripeSignature);",
+					"console.log('Payload:', body);",
 					""
 				]
 			}
